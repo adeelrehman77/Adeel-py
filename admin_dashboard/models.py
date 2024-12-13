@@ -172,3 +172,23 @@ class Invoice(models.Model):
             else:
                 self.invoice_number = 'INV000001'
         super().save(*args, **kwargs)
+
+
+class Report(models.Model):
+    REPORT_TYPES = [
+        ('DAILY', 'Daily Report'),
+        ('WEEKLY', 'Weekly Report'),
+        ('MONTHLY', 'Monthly Report')
+    ]
+    
+    type = models.CharField(max_length=10, choices=REPORT_TYPES)
+    date_from = models.DateField()
+    date_to = models.DateField()
+    total_revenue = models.DecimalField(max_digits=10, decimal_places=2)
+    total_subscriptions = models.IntegerField()
+    active_customers = models.IntegerField()
+    generated_at = models.DateTimeField(auto_now_add=True)
+    data = models.JSONField(help_text="Detailed report data in JSON format")
+
+    class Meta:
+        ordering = ['-generated_at']

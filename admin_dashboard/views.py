@@ -114,3 +114,61 @@ class InvoiceViewSet(viewsets.ModelViewSet):
         if is_paid is not None:
             queryset = queryset.filter(is_paid=is_paid == 'true')
         return queryset
+
+
+from django.db.models import Sum, Count
+from django.utils import timezone
+from datetime import timedelta
+import json
+
+class ReportViewSet(viewsets.ModelViewSet):
+    queryset = Report.objects.all()
+    serializer_class = ReportSerializer
+    permission_classes = [IsAuthenticated]
+
+    def generate_report(self, start_date, end_date, report_type):
+        subscriptions = Subscription.objects.filter(
+            start_date__gte=start_date,
+            end_date__lte=end_date
+        )
+        
+        payments = Payment.objects.filter(
+            payment_date__date__gte=start_date,
+            payment_date__date__lte=end_date,
+            status='SUCCESS'
+        )
+        
+        report_data = {
+            'subscription_count': subscriptions.count(),
+            'revenue': float(payments.aggregate(Sum('amount'))['amount__sum'] or 0),
+            'payment_methods': dict(payments.values_list('payment_method').annotate(count=Count('id'))),
+            'active_customers': CustomerProfile.objects.filter(subscription__in=subscriptions).distinct().count()
+        }
+        
+        return Report.objects.create(
+            type=report_type,
+            date_from=start_date,
+            date_to=end_date,
+            total_revenue=report_data['revenue'],
+            total_subscriptions=report_data['subscription_count'],
+            active_customers=report_data['active_customers'],
+            data=report_data
+        )
+
+    @action(detail=False, methods=['post'])
+    def generate(self, request):
+        report_type = request.data.get('type', 'DAILY')
+        today = timezone.now().date()
+        
+        if report_type == 'DAILY':
+            start_date = today
+            end_date = today
+        elif report_type == 'WEEKLY':
+            start_date = today - timedelta(days=7)
+            end_date = today
+        else:  # MONTHLY
+            start_date = today - timedelta(days=30)
+            end_date = today
+            
+        report = self.generate_report(start_date, end_date, report_type)
+        return Response(self.get_serializer(report).data)

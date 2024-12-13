@@ -40,6 +40,14 @@ class CustomerProfileSerializer(serializers.ModelSerializer):
         model = CustomerProfile
         fields = ['id', 'first_name', 'last_name', 'phone_number', 'address', 'location']
 
+class ReportSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Report
+        fields = ['id', 'type', 'date_from', 'date_to', 'total_revenue', 
+                 'total_subscriptions', 'active_customers', 'generated_at', 'data']
+        read_only_fields = ['generated_at']
+
+
 class SubscriptionSerializer(serializers.ModelSerializer):
     customer = CustomerProfileSerializer(read_only=True)
     menu_list = MenuListSerializer(read_only=True)
