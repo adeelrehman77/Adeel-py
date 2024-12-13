@@ -23,17 +23,40 @@ class Item(models.Model):
     description = models.TextField()
     price = models.DecimalField(max_digits=10, decimal_places=2)
     is_active = models.BooleanField(default=True)
+    image = models.URLField(blank=True)
+    preparation_time = models.IntegerField(help_text="Preparation time in minutes", default=30)
+    customization_options = models.JSONField(default=dict, blank=True, 
+        help_text="Store customization options as JSON")
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
 
     def __str__(self):
         return self.name
+        
+    def clean(self):
+        from django.core.exceptions import ValidationError
+        if not self.is_active and self.menulist_set.filter(is_active=True).exists():
+            raise ValidationError('Cannot deactivate item while it is part of an active menu')
 
 class MenuList(models.Model):
     name = models.CharField(max_length=100)
     items = models.ManyToManyField(Item)
     is_active = models.BooleanField(default=True)
+    description = models.TextField(blank=True)
+    price = models.DecimalField(max_digits=10, decimal_places=2, null=True, blank=True,
+        help_text="Optional package price")
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
 
     def __str__(self):
         return self.name
+
+    def clean(self):
+        from django.core.exceptions import ValidationError
+        if not self.items.exists() and self.is_active:
+            raise ValidationError('Cannot activate menu list without items')
+        if self.items.filter(is_active=False).exists():
+            raise ValidationError('Cannot include inactive items in menu list')
 
 class TimeSlot(models.Model):
     start_time = models.TimeField()
