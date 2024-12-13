@@ -32,6 +32,14 @@ class MenuListViewSet(viewsets.ModelViewSet):
     queryset = MenuList.objects.all()
     serializer_class = MenuListSerializer
     permission_classes = [IsAuthenticated]
+    
+    def perform_create(self, serializer):
+        instance = serializer.save()
+        instance.full_clean()
+        
+    def perform_update(self, serializer):
+        instance = serializer.save()
+        instance.full_clean()
 
 class TimeSlotViewSet(viewsets.ModelViewSet):
     queryset = TimeSlot.objects.all()

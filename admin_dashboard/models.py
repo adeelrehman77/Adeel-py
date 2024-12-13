@@ -45,8 +45,19 @@ class MenuList(models.Model):
     description = models.TextField(blank=True)
     price = models.DecimalField(max_digits=10, decimal_places=2, null=True, blank=True,
         help_text="Optional package price")
+    max_items = models.PositiveIntegerField(default=10)
+    nutritional_info = models.JSONField(default=dict, blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
+    
+    def clean(self):
+        from django.core.exceptions import ValidationError
+        if self.items.count() > self.max_items:
+            raise ValidationError(f'Menu cannot have more than {self.max_items} items')
+        if not self.items.exists() and self.is_active:
+            raise ValidationError('Cannot activate menu without items')
+        if self.items.filter(is_active=False).exists():
+            raise ValidationError('Cannot include inactive items in menu')
 
     def __str__(self):
         return self.name
