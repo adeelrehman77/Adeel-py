@@ -1,6 +1,10 @@
 
 from django.contrib import admin
-from .models import Category, Item, MenuList, TimeSlot, CustomerProfile, Subscription
+from .models import (
+    Category, Item, MenuList, TimeSlot, CustomerProfile, 
+    Subscription, DeliverySchedule, Notification, Payment, 
+    Invoice, Report
+)
 
 @admin.register(Category)
 class CategoryAdmin(admin.ModelAdmin):
@@ -35,16 +39,44 @@ class TimeSlotAdmin(admin.ModelAdmin):
 
 @admin.register(CustomerProfile)
 class CustomerProfileAdmin(admin.ModelAdmin):
-    list_display = ('full_name', 'phone_number', 'location')
-    search_fields = ('first_name', 'last_name', 'phone_number')
+    list_display = ('get_full_name', 'phone_number', 'location')
+    search_fields = ('user__first_name', 'user__last_name', 'phone_number')
     
-    def full_name(self, obj):
-        return f"{obj.first_name} {obj.last_name}"
-    full_name.short_description = 'Customer Name'
+    def get_full_name(self, obj):
+        return f"{obj.user.first_name} {obj.user.last_name}"
+    get_full_name.short_description = 'Customer Name'
 
 @admin.register(Subscription)
 class SubscriptionAdmin(admin.ModelAdmin):
-    list_display = ('customer', 'menu_list', 'start_date', 'end_date', 'payment_mode')
-    list_filter = ('payment_mode', 'delivery_notification')
-    search_fields = ('customer__first_name', 'customer__last_name')
-    date_hierarchy = 'start_date'
+    list_display = ('customer', 'menu', 'start_date', 'end_date', 'status')
+    list_filter = ('status', 'start_date', 'end_date')
+    search_fields = ('customer__user__first_name', 'customer__user__last_name')
+
+@admin.register(DeliverySchedule)
+class DeliveryScheduleAdmin(admin.ModelAdmin):
+    list_display = ('subscription', 'delivery_date', 'time_slot', 'status')
+    list_filter = ('status', 'delivery_date')
+    search_fields = ('subscription__customer__user__first_name',)
+
+@admin.register(Notification)
+class NotificationAdmin(admin.ModelAdmin):
+    list_display = ('customer', 'title', 'created_at', 'is_read')
+    list_filter = ('is_read', 'created_at')
+    search_fields = ('customer__user__first_name', 'title')
+
+@admin.register(Payment)
+class PaymentAdmin(admin.ModelAdmin):
+    list_display = ('subscription', 'amount', 'payment_date', 'status')
+    list_filter = ('status', 'payment_date')
+    search_fields = ('subscription__customer__user__first_name',)
+
+@admin.register(Invoice)
+class InvoiceAdmin(admin.ModelAdmin):
+    list_display = ('subscription', 'amount', 'generated_at', 'is_paid')
+    list_filter = ('is_paid', 'generated_at')
+    search_fields = ('subscription__customer__user__first_name',)
+
+@admin.register(Report)
+class ReportAdmin(admin.ModelAdmin):
+    list_display = ('type', 'date_from', 'date_to', 'total_revenue')
+    list_filter = ('type', 'date_from', 'date_to')
