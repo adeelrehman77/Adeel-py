@@ -9,6 +9,8 @@ router.register(r'categories', CategoryViewSet)
 router.register(r'items', ItemViewSet)
 router.register(r'menus', MenuListViewSet)
 router.register(r'timeslots', TimeSlotViewSet)
+router.register(r'customers', CustomerProfileViewSet)
+router.register(r'subscriptions', SubscriptionViewSet)
 
 urlpatterns = [
     path('admin/', admin.site.urls),

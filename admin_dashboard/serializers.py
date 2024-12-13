@@ -34,3 +34,23 @@ class TimeSlotSerializer(serializers.ModelSerializer):
     class Meta:
         model = TimeSlot
         fields = ['id', 'start_time', 'end_time', 'is_active']
+
+class CustomerProfileSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = CustomerProfile
+        fields = ['id', 'first_name', 'last_name', 'phone_number', 'address', 'location']
+
+class SubscriptionSerializer(serializers.ModelSerializer):
+    customer = CustomerProfileSerializer(read_only=True)
+    menu_list = MenuListSerializer(read_only=True)
+    time_slot = TimeSlotSerializer(read_only=True)
+    
+    class Meta:
+        model = Subscription
+        fields = ['id', 'customer', 'menu_list', 'time_slot', 'start_date', 
+                 'end_date', 'selected_days', 'payment_mode', 'delivery_notification']
+        
+    def validate(self, data):
+        if (data['end_date'] - data['start_date']).days > 30:
+            raise serializers.ValidationError("Subscription duration cannot exceed 30 days")
+        return data

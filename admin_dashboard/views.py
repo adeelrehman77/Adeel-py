@@ -37,3 +37,22 @@ class TimeSlotViewSet(viewsets.ModelViewSet):
     queryset = TimeSlot.objects.all()
     serializer_class = TimeSlotSerializer
     permission_classes = [IsAdminUser]
+
+class CustomerProfileViewSet(viewsets.ModelViewSet):
+    queryset = CustomerProfile.objects.all()
+    serializer_class = CustomerProfileSerializer
+    permission_classes = [IsAuthenticated]
+
+class SubscriptionViewSet(viewsets.ModelViewSet):
+    queryset = Subscription.objects.all()
+    serializer_class = SubscriptionSerializer
+    permission_classes = [IsAuthenticated]
+    
+    def get_queryset(self):
+        queryset = Subscription.objects.all()
+        if not self.request.user.is_staff:
+            # Filter subscriptions for non-admin users
+            customer_id = self.request.query_params.get('customer_id', None)
+            if customer_id:
+                queryset = queryset.filter(customer_id=customer_id)
+        return queryset
