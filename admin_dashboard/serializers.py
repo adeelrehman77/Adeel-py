@@ -61,3 +61,9 @@ class DeliveryScheduleSerializer(serializers.ModelSerializer):
         fields = ['id', 'subscription', 'delivery_date', 'status', 
                  'delivery_notes', 'created_at', 'updated_at']
         read_only_fields = ['created_at', 'updated_at']
+
+class NotificationSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Notification
+        fields = ['id', 'customer', 'type', 'title', 'message', 'is_read', 'created_at']
+        read_only_fields = ['created_at']

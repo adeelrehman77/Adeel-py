@@ -118,3 +118,21 @@ class DeliverySchedule(models.Model):
 
     class Meta:
         ordering = ['delivery_date', 'created_at']
+
+class Notification(models.Model):
+    NOTIFICATION_TYPES = [
+        ('DELIVERY', 'Delivery Update'),
+        ('SUBSCRIPTION', 'Subscription Update'),
+        ('MENU', 'Menu Update'),
+        ('GENERAL', 'General Message')
+    ]
+    
+    customer = models.ForeignKey(CustomerProfile, on_delete=models.CASCADE)
+    type = models.CharField(max_length=12, choices=NOTIFICATION_TYPES)
+    title = models.CharField(max_length=200)
+    message = models.TextField()
+    is_read = models.BooleanField(default=False)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        ordering = ['-created_at']

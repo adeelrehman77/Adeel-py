@@ -71,3 +71,22 @@ class DeliveryScheduleViewSet(viewsets.ModelViewSet):
         if date:
             queryset = queryset.filter(delivery_date=date)
         return queryset
+
+class NotificationViewSet(viewsets.ModelViewSet):
+    queryset = Notification.objects.all()
+    serializer_class = NotificationSerializer
+    permission_classes = [IsAuthenticated]
+    
+    def get_queryset(self):
+        queryset = Notification.objects.all()
+        customer_id = self.request.query_params.get('customer_id', None)
+        if customer_id:
+            queryset = queryset.filter(customer_id=customer_id)
+        return queryset
+
+    @action(detail=True, methods=['post'])
+    def mark_read(self, request, pk=None):
+        notification = self.get_object()
+        notification.is_read = True
+        notification.save()
+        return Response({'status': 'notification marked as read'})
