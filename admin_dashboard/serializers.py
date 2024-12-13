@@ -67,3 +67,19 @@ class NotificationSerializer(serializers.ModelSerializer):
         model = Notification
         fields = ['id', 'customer', 'type', 'title', 'message', 'is_read', 'created_at']
         read_only_fields = ['created_at']
+
+class PaymentSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Payment
+        fields = ['id', 'subscription', 'amount', 'transaction_id', 'status', 
+                 'payment_date', 'payment_method', 'notes']
+        read_only_fields = ['payment_date']
+
+class InvoiceSerializer(serializers.ModelSerializer):
+    payment = PaymentSerializer(read_only=True)
+    
+    class Meta:
+        model = Invoice
+        fields = ['id', 'payment', 'invoice_number', 'generated_date', 
+                 'due_date', 'is_paid']
+        read_only_fields = ['invoice_number', 'generated_date']

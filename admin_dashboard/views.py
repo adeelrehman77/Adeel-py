@@ -90,3 +90,27 @@ class NotificationViewSet(viewsets.ModelViewSet):
         notification.is_read = True
         notification.save()
         return Response({'status': 'notification marked as read'})
+
+class PaymentViewSet(viewsets.ModelViewSet):
+    queryset = Payment.objects.all()
+    serializer_class = PaymentSerializer
+    permission_classes = [IsAuthenticated]
+    
+    def get_queryset(self):
+        queryset = Payment.objects.all()
+        subscription_id = self.request.query_params.get('subscription_id', None)
+        if subscription_id:
+            queryset = queryset.filter(subscription_id=subscription_id)
+        return queryset
+
+class InvoiceViewSet(viewsets.ModelViewSet):
+    queryset = Invoice.objects.all()
+    serializer_class = InvoiceSerializer
+    permission_classes = [IsAuthenticated]
+
+    def get_queryset(self):
+        queryset = Invoice.objects.all()
+        is_paid = self.request.query_params.get('is_paid', None)
+        if is_paid is not None:
+            queryset = queryset.filter(is_paid=is_paid == 'true')
+        return queryset

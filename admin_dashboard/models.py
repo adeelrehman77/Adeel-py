@@ -136,3 +136,39 @@ class Notification(models.Model):
 
     class Meta:
         ordering = ['-created_at']
+
+class Payment(models.Model):
+    STATUS_CHOICES = [
+        ('PENDING', 'Pending'),
+        ('SUCCESS', 'Success'),
+        ('FAILED', 'Failed'),
+        ('REFUNDED', 'Refunded')
+    ]
+    
+    subscription = models.ForeignKey(Subscription, on_delete=models.CASCADE)
+    amount = models.DecimalField(max_digits=10, decimal_places=2)
+    transaction_id = models.CharField(max_length=100, unique=True)
+    status = models.CharField(max_length=10, choices=STATUS_CHOICES, default='PENDING')
+    payment_date = models.DateTimeField(auto_now_add=True)
+    payment_method = models.CharField(max_length=50)
+    notes = models.TextField(blank=True)
+
+    class Meta:
+        ordering = ['-payment_date']
+
+class Invoice(models.Model):
+    payment = models.OneToOneField(Payment, on_delete=models.CASCADE)
+    invoice_number = models.CharField(max_length=20, unique=True)
+    generated_date = models.DateTimeField(auto_now_add=True)
+    due_date = models.DateField()
+    is_paid = models.BooleanField(default=False)
+    
+    def save(self, *args, **kwargs):
+        if not self.invoice_number:
+            last_invoice = Invoice.objects.order_by('-invoice_number').first()
+            if last_invoice:
+                last_number = int(last_invoice.invoice_number[3:])
+                self.invoice_number = f'INV{str(last_number + 1).zfill(6)}'
+            else:
+                self.invoice_number = 'INV000001'
+        super().save(*args, **kwargs)

@@ -13,6 +13,8 @@ router.register(r'customers', CustomerProfileViewSet)
 router.register(r'subscriptions', SubscriptionViewSet)
 router.register(r'deliveries', DeliveryScheduleViewSet)
 router.register(r'notifications', NotificationViewSet)
+router.register(r'payments', PaymentViewSet)
+router.register(r'invoices', InvoiceViewSet)
 
 urlpatterns = [
     path('admin/', admin.site.urls),
