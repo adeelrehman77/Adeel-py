@@ -18,4 +18,4 @@ deploymentTarget = "gce"
 [[ports]]
 localPort = 3000
 externalPort = 3000
-exposeLocalhost = true
+protocol = "http"
