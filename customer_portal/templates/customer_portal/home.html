@@ -1,0 +1,10 @@
+
+{% extends 'customer_portal/base.html' %}
+
+{% block content %}
+<div class="text-center">
+    <h1>Welcome to Fun Adventure Kitchen</h1>
+    <p class="lead">Your journey to delicious monthly food subscriptions starts here!</p>
+    <a href="{% url 'subscribe' %}" class="btn btn-primary">Subscribe Now</a>
+</div>
+{% endblock %}

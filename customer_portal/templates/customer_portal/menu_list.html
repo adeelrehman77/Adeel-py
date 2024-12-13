@@ -1,0 +1,23 @@
+
+{% extends 'customer_portal/base.html' %}
+
+{% block content %}
+<h2>Our Menus</h2>
+<div class="row mt-4">
+    {% for menu in menus %}
+    <div class="col-md-4 mb-4">
+        <div class="card">
+            <div class="card-body">
+                <h5 class="card-title">{{ menu.name }}</h5>
+                <ul class="list-unstyled">
+                    {% for item in menu.items.all %}
+                    <li>{{ item.name }} - ${{ item.price }}</li>
+                    {% endfor %}
+                </ul>
+                <a href="{% url 'subscribe' %}" class="btn btn-primary">Subscribe to this Menu</a>
+            </div>
+        </div>
+    </div>
+    {% endfor %}
+</div>
+{% endblock %}
