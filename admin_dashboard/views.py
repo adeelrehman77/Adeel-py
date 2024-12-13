@@ -172,3 +172,28 @@ class ReportViewSet(viewsets.ModelViewSet):
             
         report = self.generate_report(start_date, end_date, report_type)
         return Response(self.get_serializer(report).data)
+
+
+class IngredientViewSet(viewsets.ModelViewSet):
+    queryset = Ingredient.objects.all()
+    serializer_class = IngredientSerializer
+    permission_classes = [IsAdminUser]
+
+    @action(detail=False, methods=['get'])
+    def low_stock(self):
+        low_stock = Ingredient.objects.filter(quantity__lte=F('minimum_stock'))
+        serializer = self.get_serializer(low_stock, many=True)
+        return Response(serializer.data)
+
+
+class IngredientUsageViewSet(viewsets.ModelViewSet):
+    queryset = IngredientUsage.objects.all()
+    serializer_class = IngredientUsageSerializer
+    permission_classes = [IsAdminUser]
+
+    def get_queryset(self):
+        queryset = IngredientUsage.objects.all()
+        ingredient_id = self.request.query_params.get('ingredient', None)
+        if ingredient_id:
+            queryset = queryset.filter(ingredient_id=ingredient_id)
+        return queryset

@@ -16,6 +16,8 @@ router.register(r'notifications', NotificationViewSet)
 router.register(r'payments', PaymentViewSet)
 router.register(r'invoices', InvoiceViewSet)
 router.register(r'reports', ReportViewSet)
+router.register(r'ingredients', IngredientViewSet)
+router.register(r'ingredient-usage', IngredientUsageViewSet)
 
 urlpatterns = [
     path('admin/', admin.site.urls),

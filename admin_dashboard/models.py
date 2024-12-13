@@ -192,3 +192,34 @@ class Report(models.Model):
 
     class Meta:
         ordering = ['-generated_at']
+
+
+class Ingredient(models.Model):
+    name = models.CharField(max_length=100)
+    description = models.TextField(blank=True)
+    unit = models.CharField(max_length=20)  # e.g., kg, liters, pieces
+    quantity = models.DecimalField(max_digits=10, decimal_places=2)
+    minimum_stock = models.DecimalField(max_digits=10, decimal_places=2)
+    cost_per_unit = models.DecimalField(max_digits=10, decimal_places=2)
+    supplier = models.CharField(max_length=100, blank=True)
+    last_restocked = models.DateTimeField(auto_now=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return f"{self.name} ({self.quantity} {self.unit})"
+
+    class Meta:
+        ordering = ['name']
+
+
+class IngredientUsage(models.Model):
+    ingredient = models.ForeignKey(Ingredient, on_delete=models.CASCADE)
+    item = models.ForeignKey(Item, on_delete=models.CASCADE)
+    quantity_used = models.DecimalField(max_digits=10, decimal_places=2)
+    date_used = models.DateTimeField(auto_now_add=True)
+    
+    def save(self, *args, **kwargs):
+        # Update ingredient quantity when used
+        self.ingredient.quantity -= self.quantity_used
+        self.ingredient.save()
+        super().save(*args, **kwargs)
