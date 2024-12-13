@@ -11,6 +11,7 @@ router.register(r'menus', MenuListViewSet)
 router.register(r'timeslots', TimeSlotViewSet)
 router.register(r'customers', CustomerProfileViewSet)
 router.register(r'subscriptions', SubscriptionViewSet)
+router.register(r'deliveries', DeliveryScheduleViewSet)
 
 urlpatterns = [
     path('admin/', admin.site.urls),

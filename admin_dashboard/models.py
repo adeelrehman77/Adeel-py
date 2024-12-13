@@ -99,3 +99,22 @@ class Subscription(models.Model):
         delta = self.end_date - self.start_date
         if delta.days > 30:
             raise ValidationError('Subscription duration cannot exceed 30 days')
+
+class DeliverySchedule(models.Model):
+    STATUS_CHOICES = [
+        ('PENDING', 'Pending'),
+        ('PREPARING', 'Preparing'),
+        ('OUT', 'Out for Delivery'),
+        ('DELIVERED', 'Delivered'),
+        ('CANCELLED', 'Cancelled'),
+    ]
+    
+    subscription = models.ForeignKey(Subscription, on_delete=models.CASCADE)
+    delivery_date = models.DateField()
+    status = models.CharField(max_length=10, choices=STATUS_CHOICES, default='PENDING')
+    delivery_notes = models.TextField(blank=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        ordering = ['delivery_date', 'created_at']

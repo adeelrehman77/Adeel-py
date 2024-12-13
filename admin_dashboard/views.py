@@ -51,8 +51,23 @@ class SubscriptionViewSet(viewsets.ModelViewSet):
     def get_queryset(self):
         queryset = Subscription.objects.all()
         if not self.request.user.is_staff:
-            # Filter subscriptions for non-admin users
             customer_id = self.request.query_params.get('customer_id', None)
             if customer_id:
                 queryset = queryset.filter(customer_id=customer_id)
+        return queryset
+
+class DeliveryScheduleViewSet(viewsets.ModelViewSet):
+    queryset = DeliverySchedule.objects.all()
+    serializer_class = DeliveryScheduleSerializer
+    permission_classes = [IsAuthenticated]
+
+    def get_queryset(self):
+        queryset = DeliverySchedule.objects.all()
+        status = self.request.query_params.get('status', None)
+        date = self.request.query_params.get('date', None)
+        
+        if status:
+            queryset = queryset.filter(status=status)
+        if date:
+            queryset = queryset.filter(delivery_date=date)
         return queryset

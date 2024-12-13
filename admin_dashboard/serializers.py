@@ -54,3 +54,10 @@ class SubscriptionSerializer(serializers.ModelSerializer):
         if (data['end_date'] - data['start_date']).days > 30:
             raise serializers.ValidationError("Subscription duration cannot exceed 30 days")
         return data
+
+class DeliveryScheduleSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = DeliverySchedule
+        fields = ['id', 'subscription', 'delivery_date', 'status', 
+                 'delivery_notes', 'created_at', 'updated_at']
+        read_only_fields = ['created_at', 'updated_at']
