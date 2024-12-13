@@ -28,9 +28,8 @@ DEBUG = True
 
 ALLOWED_HOSTS = ['*']
 CSRF_TRUSTED_ORIGINS = ["https://*.replit.dev", "https://*.replit.app"]
-X_FRAME_OPTIONS = 'SAMEORIGIN'
-CSRF_COOKIE_SECURE = False
-SESSION_COOKIE_SECURE = False
+X_FRAME_OPTIONS = 'ALLOW'
+SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
 
 # Application definition
 
